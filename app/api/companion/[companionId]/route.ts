@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import prismadb from "@/lib/prismadb";
@@ -9,16 +8,24 @@ export async function PATCH(
   { params }: { params: { companionId: string } },
 ) {
   try {
+    const userId = req.headers.get("userId");
+
+    if (!userId) {
+      return Response.json(
+        {
+          message: "userId not found. please login",
+        },
+        { status: 401 },
+      );
+    }
+
+    const user = prismadb.user.findUnique({ where: { id: userId } });
+
     const body = await req.json();
-    const user = await currentUser();
     const { src, name, description, instructions, seed, categoryId } = body;
 
     if (!params.companionId) {
       return new NextResponse("Companion ID required", { status: 400 });
-    }
-
-    if (!user || !user.id || !user.firstName) {
-      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     if (
@@ -32,7 +39,7 @@ export async function PATCH(
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const isPro = await checkSubscription();
+    const isPro = await checkSubscription({ userId });
 
     if (!isPro) {
       return new NextResponse("Pro subscription required", { status: 403 });
@@ -63,11 +70,20 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  request: Request,
+  req: Request,
   { params }: { params: { companionId: string } },
 ) {
   try {
-    const { userId } = auth();
+    const userId = req.headers.get("userId");
+
+    if (!userId) {
+      return Response.json(
+        {
+          message: "userId not found. please login",
+        },
+        { status: 401 },
+      );
+    }
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });

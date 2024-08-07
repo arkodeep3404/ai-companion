@@ -16,7 +16,7 @@ async function main() {
       ],
     });
   } catch (error) {
-    console.error("Error seeding default categories", error);
+    console.log("Error seeding default categories", error);
   } finally {
     db.$disconnect();
   }

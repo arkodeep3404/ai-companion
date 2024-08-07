@@ -1,4 +1,3 @@
-import { auth, currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import prismadb from "@/lib/prismadb";
@@ -6,13 +5,22 @@ import { checkSubscription } from "@/lib/subscription";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const user = await currentUser();
-    const { src, name, description, instructions, seed, categoryId } = body;
+    const userId = req.headers.get("userId");
 
-    if (!user || !user.id || !user.firstName) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (!userId) {
+      return Response.json(
+        {
+          message: "userId not found. please login",
+        },
+        { status: 401 },
+      );
     }
+
+    const user = prismadb.user.findUnique({ where: { id: userId } });
+
+    const body = await req.json();
+
+    const { src, name, description, instructions, seed, categoryId } = body;
 
     if (
       !src ||
@@ -25,7 +33,7 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const isPro = await checkSubscription();
+    const isPro = await checkSubscription({ userId });
 
     if (!isPro) {
       return new NextResponse("Pro subscription required", { status: 403 });

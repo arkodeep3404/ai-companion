@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { auth, redirectToSignIn } from "@clerk/nextjs";
-
 import prismadb from "@/lib/prismadb";
 
 import { ChatClient } from "./components/client";
+import getCurrentUser from "@/lib/getCurrentUser";
+import { cookies } from "next/headers";
 
 interface ChatIdPageProps {
   params: {
@@ -12,11 +12,9 @@ interface ChatIdPageProps {
 }
 
 const ChatIdPage = async ({ params }: ChatIdPageProps) => {
-  const { userId } = auth();
-
-  if (!userId) {
-    return redirectToSignIn();
-  }
+  const token = cookies().get("companion_auth")?.value!;
+  const currentUser = getCurrentUser(token);
+  const userId = currentUser.id;
 
   const companion = await prismadb.companion.findUnique({
     where: {

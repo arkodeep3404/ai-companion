@@ -8,6 +8,14 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id        String @id @default(uuid())
+  email     String @unique
+  token     String @unique
+  firstName String
+  lastName  String
+}
+
 model Category {
   id         String      @id @default(uuid())
   name       String
@@ -65,10 +73,10 @@ model UserSubscription {
 }
 
 model UserSettings {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  aiRequestsCount Int      @default(0)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id              String @id @default(cuid())
+  userId          String @unique
+  aiRequestsCount Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

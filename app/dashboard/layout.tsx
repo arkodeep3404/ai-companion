@@ -1,9 +1,14 @@
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
+import getCurrentUser from "@/lib/getCurrentUser";
 import { checkSubscription } from "@/lib/subscription";
+import { cookies } from "next/headers";
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
-  const isPro = await checkSubscription();
+  const token = cookies().get("companion_auth")?.value!;
+  const currentUser = getCurrentUser(token);
+  const userId = currentUser.id;
+  const isPro = await checkSubscription({ userId });
 
   return (
     <div className="h-full">

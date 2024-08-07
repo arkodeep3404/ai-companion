@@ -9,8 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@clerk/nextjs";
-import { Companion, Message } from "@prisma/client";
+import { Companion, Message, User } from "@prisma/client";
 import axios from "axios";
 import {
   ChevronLeft,
@@ -21,6 +20,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface ChatHeaderProps {
   companion: Companion & {
@@ -30,8 +30,23 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ companion }: ChatHeaderProps) => {
   const router = useRouter();
-  const { user } = useUser();
   const { toast } = useToast();
+  let user: User = {
+    id: "",
+    email: "",
+    token: "",
+    firstName: "",
+    lastName: "",
+  };
+
+  async function fetchCurrentUser() {
+    const response = await axios.get("/api/details");
+    user = response.data.currentUser;
+  }
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
 
   const onDelete = async () => {
     try {

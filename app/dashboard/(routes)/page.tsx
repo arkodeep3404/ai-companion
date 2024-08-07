@@ -1,8 +1,9 @@
 import { Categories } from "@/components/categories";
 import { Companions } from "@/components/companions";
 import { SearchInput } from "@/components/search-input";
+import getCurrentUser from "@/lib/getCurrentUser";
 import prismadb from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs";
+import { cookies } from "next/headers";
 
 interface PageProps {
   searchParams: {
@@ -12,7 +13,9 @@ interface PageProps {
 }
 
 const Page = async ({ searchParams }: PageProps) => {
-  const { userId } = auth();
+  const token = cookies().get("companion_auth")?.value!;
+  const currentUser = getCurrentUser(token);
+  const userId = currentUser.id;
 
   let data;
   if (userId) {

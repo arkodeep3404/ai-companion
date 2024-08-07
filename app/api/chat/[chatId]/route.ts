@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import { StreamingTextResponse, LangChainStream } from "ai";
-import { currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 import { MemoryManager } from "@/lib/memory";
@@ -17,25 +16,33 @@ import { checkSubscription } from "@/lib/subscription";
 dotenv.config({ path: `.env` });
 
 export async function POST(
-  request: Request,
+  req: Request,
   { params }: { params: { chatId: string } },
 ) {
   try {
-    const { prompt } = await request.json();
-    const user = await currentUser();
+    const userId = req.headers.get("userId");
 
-    if (!user || !user.firstName || !user.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    if (!userId) {
+      return Response.json(
+        {
+          message: "userId not found. please login",
+        },
+        { status: 401 },
+      );
     }
 
-    const identifier = request.url + "-" + user.id;
+    const user = prismadb.user.findUnique({ where: { id: userId } });
+
+    const { prompt } = await req.json();
+
+    const identifier = req.url + "-" + user.id;
     const { success } = await rateLimit(identifier);
 
     if (!success) {
       return new NextResponse("Rate limit exceeded", { status: 429 });
     }
 
-    const isPro = await checkSubscription();
+    const isPro = await checkSubscription({ userId });
 
     if (!isPro) {
       const checkAiRequestsCountResp = await checkAiRequestsCount();
@@ -122,7 +129,7 @@ export async function POST(
 
         ${recentChatHistory}\n${companion.name}:`,
       )
-      .catch(console.error);
+      .catch(console.log);
 
     const content = resp?.content as string;
 

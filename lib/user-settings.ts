@@ -1,10 +1,12 @@
-import { auth } from "@clerk/nextjs";
-
 import { MAX_AI_REQUESTS_FREE_COUNTS } from "@/constants";
 import prismadb from "./prismadb";
+import getCurrentUser from "@/lib/getCurrentUser";
+import { cookies } from "next/headers";
 
 export const decreaseAiRequestsCount = async () => {
-  const { userId } = auth();
+  const token = cookies().get("companion_auth")?.value!;
+  const currentUser = getCurrentUser(token);
+  const userId = currentUser.id;
 
   if (!userId) {
     return;
@@ -31,7 +33,9 @@ export const decreaseAiRequestsCount = async () => {
 };
 
 export const checkAiRequestsCount = async () => {
-  const { userId } = auth();
+  const token = cookies().get("companion_auth")?.value!;
+  const currentUser = getCurrentUser(token);
+  const userId = currentUser.id;
 
   if (!userId) {
     return false;

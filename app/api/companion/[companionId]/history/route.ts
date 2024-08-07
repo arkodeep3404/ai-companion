@@ -1,6 +1,5 @@
 import { MemoryManager } from "@/lib/memory";
 import prismadb from "@/lib/prismadb";
-import { currentUser } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function DELETE(
@@ -8,14 +7,21 @@ export async function DELETE(
   { params }: { params: { companionId: string } },
 ) {
   try {
-    const user = await currentUser();
+    const userId = req.headers.get("userId");
+
+    if (!userId) {
+      return Response.json(
+        {
+          message: "userId not found. please login",
+        },
+        { status: 401 },
+      );
+    }
+
+    const user = prismadb.user.findUnique({ where: { id: userId } });
 
     if (!params.companionId) {
       return new NextResponse("Companion ID is required", { status: 400 });
-    }
-
-    if (!user || !user.id || !user.firstName) {
-      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const memoryManager = await MemoryManager.getInstance();
