@@ -25,11 +25,14 @@ export const ImageUpload = ({
     return null;
   }
 
+  //permanently delete
+
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    event.preventDefault();
     const file = event.target.files?.[0];
-    console.log("file upload", file);
+
     if (file) {
       const formData = new FormData();
       formData.append("image", file);
@@ -37,9 +40,8 @@ export const ImageUpload = ({
       const response = await axios.post("/api/imageUpload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      //console.log(response);
 
-      //onChange(response.data.xyz);
+      onChange(response.data.url);
     }
   };
 

@@ -20,7 +20,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface ChatHeaderProps {
   companion: Companion & {
@@ -31,17 +31,11 @@ interface ChatHeaderProps {
 export const ChatHeader = ({ companion }: ChatHeaderProps) => {
   const router = useRouter();
   const { toast } = useToast();
-  let user: User = {
-    id: "",
-    email: "",
-    token: "",
-    firstName: "",
-    lastName: "",
-  };
+  const [user, setUser] = useState<User>();
 
   async function fetchCurrentUser() {
     const response = await axios.get("/api/details");
-    user = response.data.currentUser;
+    setUser(response.data.currentUser);
   }
 
   useEffect(() => {
@@ -55,7 +49,7 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
       toast({ description: "Success." });
 
       router.refresh();
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       toast({
         description: "Something went wrong.",
@@ -111,7 +105,9 @@ export const ChatHeader = ({ companion }: ChatHeaderProps) => {
           {user?.id === companion.userId && (
             <>
               <DropdownMenuItem
-                onClick={() => router.push(`/companion/${companion.id}`)}
+                onClick={() =>
+                  router.push(`/dashboard/companion/${companion.id}`)
+                }
               >
                 <Edit className="mr-2 h-4 w-4" />
                 Edit

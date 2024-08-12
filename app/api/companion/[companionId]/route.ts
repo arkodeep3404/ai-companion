@@ -19,7 +19,7 @@ export async function PATCH(
       );
     }
 
-    const user = prismadb.user.findUnique({ where: { id: userId } });
+    const user = await prismadb.user.findUnique({ where: { id: userId } });
 
     const body = await req.json();
     const { src, name, description, instructions, seed, categoryId } = body;
@@ -39,7 +39,7 @@ export async function PATCH(
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    const isPro = await checkSubscription({ userId });
+    const isPro = true; //await checkSubscription({ userId });
 
     if (!isPro) {
       return new NextResponse("Pro subscription required", { status: 403 });
@@ -95,6 +95,8 @@ export async function DELETE(
         id: params.companionId,
       },
     });
+
+    // TODO: DELETE COMPANION IMAGE UPON DELETION
 
     return NextResponse.json(companion);
   } catch (error) {

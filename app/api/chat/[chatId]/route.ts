@@ -31,7 +31,7 @@ export async function POST(
       );
     }
 
-    const user = prismadb.user.findUnique({ where: { id: userId } });
+    const user = await prismadb.user.findUnique({ where: { id: userId } });
 
     const { prompt } = await req.json();
 

@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const user = prismadb.user.findUnique({ where: { id: userId } });
+    const user = await prismadb.user.findUnique({ where: { id: userId } });
 
     const userSubscription = await prismadb.userSubscription.findUnique({
       where: {

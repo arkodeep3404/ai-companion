@@ -18,7 +18,7 @@ export async function DELETE(
       );
     }
 
-    const user = prismadb.user.findUnique({ where: { id: userId } });
+    const user = await prismadb.user.findUnique({ where: { id: userId } });
 
     if (!params.companionId) {
       return new NextResponse("Companion ID is required", { status: 400 });
