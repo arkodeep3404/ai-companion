@@ -15,13 +15,13 @@ interface CompanionIdPageProps {
 
 const CompanionIdPage = async ({ params }: CompanionIdPageProps) => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
 
-  const validSubscription = await checkSubscription({ userId });
+  const validSubscription = true; //await checkSubscription({ userId });
 
   if (!validSubscription) {
-    return redirect("/");
+    return redirect("/dashboard");
   }
 
   const companion = await prismadb.companion.findUnique({

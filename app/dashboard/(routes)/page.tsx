@@ -14,7 +14,7 @@ interface PageProps {
 
 const Page = async ({ searchParams }: PageProps) => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
 
   let data;

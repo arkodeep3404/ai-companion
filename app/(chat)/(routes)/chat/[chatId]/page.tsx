@@ -13,7 +13,7 @@ interface ChatIdPageProps {
 
 const ChatIdPage = async ({ params }: ChatIdPageProps) => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
 
   const companion = await prismadb.companion.findUnique({

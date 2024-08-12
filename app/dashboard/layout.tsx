@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 
 const RootLayout = async ({ children }: { children: React.ReactNode }) => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
   const isPro = await checkSubscription({ userId });
 

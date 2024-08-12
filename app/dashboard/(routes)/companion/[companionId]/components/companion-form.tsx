@@ -108,7 +108,7 @@ export const CompanionForm = ({
       });
 
       router.refresh();
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       toast({
         variant: "destructive",

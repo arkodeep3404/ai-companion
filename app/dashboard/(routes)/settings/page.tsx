@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 const SettingsPage = async () => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
   const isPro = await checkSubscription({ userId });
 

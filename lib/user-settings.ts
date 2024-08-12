@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 export const decreaseAiRequestsCount = async () => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
 
   if (!userId) {
@@ -34,7 +34,7 @@ export const decreaseAiRequestsCount = async () => {
 
 export const checkAiRequestsCount = async () => {
   const token = cookies().get("companion_auth")?.value!;
-  const currentUser = getCurrentUser(token);
+  const currentUser = await getCurrentUser(token);
   const userId = currentUser.id;
 
   if (!userId) {
