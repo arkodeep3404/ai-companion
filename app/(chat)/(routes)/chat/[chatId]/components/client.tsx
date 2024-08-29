@@ -31,6 +31,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
   const { input, isLoading, handleInputChange, handleSubmit, setInput } =
     useCompletion({
       api: `/api/chat/${companion.id}`,
+      streamProtocol: "text",
       onFinish(prompt, completion) {
         setInput("");
 
@@ -47,7 +48,7 @@ export const ChatClient = ({ companion }: ChatClientProps) => {
           });
         } else {
           toast({
-            description: "Something went wrong.",
+            description: e.message,
             variant: "destructive",
           });
         }
