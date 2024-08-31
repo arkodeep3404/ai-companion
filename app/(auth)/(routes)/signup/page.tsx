@@ -20,23 +20,35 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   async function signup() {
-    try {
-      const response = await axios.post("/api/signup", {
-        email,
-        firstName,
-        lastName,
-      });
+    if (
+      email.trim() === "" ||
+      firstName.trim() === "" ||
+      lastName.trim() === ""
+    ) {
+      toast({ description: "please enter all the details" });
+    } else {
+      setLoading(true);
+      try {
+        const response = await axios.post("/api/signup", {
+          email: email.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+        });
 
-      setEmail("");
-      setFirstName("");
-      setLastName("");
+        setEmail("");
+        setFirstName("");
+        setLastName("");
 
-      toast({ description: response.data.message });
-    } catch (error: any) {
-      toast({ description: error.response.data.message });
+        toast({ description: response.data.message });
+      } catch (error: any) {
+        toast({ description: error.response.data.message });
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
@@ -84,7 +96,12 @@ export default function Signup() {
                 value={email}
               />
             </div>
-            <Button type="submit" className="w-full" onClick={signup}>
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full"
+              onClick={signup}
+            >
               Create an account
             </Button>
           </div>

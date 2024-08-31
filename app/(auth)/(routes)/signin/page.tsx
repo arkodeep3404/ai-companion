@@ -18,19 +18,27 @@ import { useToast } from "@/components/ui/use-toast";
 
 export default function Signin() {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   async function signin() {
-    try {
-      const response = await axios.post("/api/signin", {
-        email,
-      });
+    if (email.trim() === "") {
+      toast({ description: "please enter your email" });
+    } else {
+      setLoading(true);
+      try {
+        const response = await axios.post("/api/signin", {
+          email: email.trim(),
+        });
 
-      setEmail("");
+        setEmail("");
 
-      toast({ description: response.data.message });
-    } catch (error: any) {
-      toast({ description: error.response.data.message });
+        toast({ description: response.data.message });
+      } catch (error: any) {
+        toast({ description: error.response.data.message });
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
@@ -57,7 +65,12 @@ export default function Signin() {
               />
             </div>
 
-            <Button type="submit" className="w-full" onClick={signin}>
+            <Button
+              disabled={loading}
+              type="submit"
+              className="w-full"
+              onClick={signin}
+            >
               Signin
             </Button>
           </div>
