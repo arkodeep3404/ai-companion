@@ -21,6 +21,15 @@ export async function GET(req: Request) {
 
     const user = await prismadb.user.findUnique({ where: { id: userId } });
 
+    if (!user) {
+      return Response.json(
+        {
+          message: "user not found with given userId",
+        },
+        { status: 404 },
+      );
+    }
+
     const userSubscription = await prismadb.userSubscription.findUnique({
       where: {
         userId,
@@ -70,3 +79,5 @@ export async function GET(req: Request) {
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
+
+export async function POST(req: Request) {}

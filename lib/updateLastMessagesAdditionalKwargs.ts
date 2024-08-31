@@ -32,14 +32,14 @@ export async function updateLastMessagesAdditionalKwargs(
 
   try {
     const getData = await client.send(new GetItemCommand(getParams));
-    const messages = getData.Item.messages.L;
-    const messagesLength = messages.length;
+    const messages = getData.Item?.messages.L!;
+    const messagesLength = messages?.length;
 
     if (messagesLength === 0) {
       return "no messages found";
     }
 
-    const updateParams = {
+    const updateParams: any = {
       TableName: tableName,
       Key: {
         id: { S: userSessionId },

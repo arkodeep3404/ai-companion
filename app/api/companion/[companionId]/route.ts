@@ -21,6 +21,15 @@ export async function PATCH(
 
     const user = await prismadb.user.findUnique({ where: { id: userId } });
 
+    if (!user) {
+      return Response.json(
+        {
+          message: "user not found with given userId",
+        },
+        { status: 404 },
+      );
+    }
+
     const body = await req.json();
     const { src, name, description, instructions, seed, categoryId } = body;
 

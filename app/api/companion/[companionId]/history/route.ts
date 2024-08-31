@@ -20,6 +20,15 @@ export async function DELETE(
 
     const user = await prismadb.user.findUnique({ where: { id: userId } });
 
+    if (!user) {
+      return Response.json(
+        {
+          message: "user not found with given userId",
+        },
+        { status: 404 },
+      );
+    }
+
     if (!params.companionId) {
       return new NextResponse("Companion ID is required", { status: 400 });
     }
