@@ -1,4 +1,4 @@
-import { MemoryManager } from "@/lib/memory";
+// import { MemoryManager } from "@/lib/memory";
 import prismadb from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
@@ -33,13 +33,15 @@ export async function DELETE(
       return new NextResponse("Companion ID is required", { status: 400 });
     }
 
-    const memoryManager = await MemoryManager.getInstance();
-    const companionKey = {
-      companionId: params.companionId,
-      userId: user.id,
-      modelName: "gpt-3.5-turbo",
-    };
-    await memoryManager.clearHistory(companionKey);
+    // const memoryManager = await MemoryManager.getInstance();
+    // const companionKey = {
+    //   companionId: params.companionId,
+    //   userId: user.id,
+    //   modelName: "gpt-3.5-turbo",
+    // };
+    // await memoryManager.clearHistory(companionKey);
+
+    // TODO: DELETE CHAT HISTORY FROM DYNAMO DB UPON COMPANION DELETION
 
     await prismadb.message.deleteMany({
       where: {
@@ -50,7 +52,7 @@ export async function DELETE(
 
     return NextResponse.json("Success");
   } catch (error) {
-    console.log("[COMPANION_PATCH]", error);
+    console.log("[COMPANION_HISTORY_DELETE]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }
