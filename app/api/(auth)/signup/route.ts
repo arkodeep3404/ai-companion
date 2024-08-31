@@ -10,51 +10,60 @@ const signupBody = zod.object({
 });
 
 export async function POST(req: Request) {
-  const parsedBody = await req.json();
-  const { success } = signupBody.safeParse(parsedBody);
+  try {
+    const parsedBody = await req.json();
+    const { success } = signupBody.safeParse(parsedBody);
 
-  if (!success) {
+    if (!success) {
+      return Response.json(
+        {
+          message: "incorrect inputs",
+        },
+        { status: 411 },
+      );
+    }
+
+    const { firstName, lastName, email } = parsedBody;
+    const origin = req.headers.get("origin") || "";
+
+    const existingUser = await prismadb.user.findUnique({
+      where: { email: email },
+    });
+
+    if (existingUser) {
+      return Response.json(
+        {
+          message: "email already exists",
+        },
+        { status: 411 },
+      );
+    }
+
+    const token = v4();
+
+    const newUser = await prismadb.user.create({
+      data: {
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        token: token,
+      },
+    });
+
+    await sendLoginEmail(email, firstName, token, origin);
+
     return Response.json(
       {
-        message: "incorrect inputs",
+        message: "user created. please check email to login.",
       },
-      { status: 411 },
+      { status: 200 },
     );
-  }
-
-  const { firstName, lastName, email } = parsedBody;
-  const origin = req.headers.get("origin") || "";
-
-  const existingUser = await prismadb.user.findUnique({
-    where: { email: email },
-  });
-
-  if (existingUser) {
+  } catch (error) {
     return Response.json(
       {
-        message: "email already exists",
+        message: "something went wrong. please try again",
       },
-      { status: 411 },
+      { status: 400 },
     );
   }
-
-  const token = v4();
-
-  const newUser = await prismadb.user.create({
-    data: {
-      email: email,
-      firstName: firstName,
-      lastName: lastName,
-      token: token,
-    },
-  });
-
-  await sendLoginEmail(email, firstName, token, origin);
-
-  return Response.json(
-    {
-      message: "user created. please check email to login.",
-    },
-    { status: 200 },
-  );
 }
