@@ -7,6 +7,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
 import { Copy } from "lucide-react";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 import { BeatLoader } from "react-spinners";
 
 export interface ChatMessageProps {
@@ -49,6 +50,8 @@ export const ChatMessage = ({
       <div className="max-w-sm whitespace-pre-wrap rounded-md bg-primary/10 px-4 py-2 text-sm">
         {isLoading ? (
           <BeatLoader color={theme === "light" ? "black" : "white"} size={5} />
+        ) : content?.startsWith("https://") ? (
+          <Image src={content} alt={content} width={500} height={500} />
         ) : (
           content
         )}

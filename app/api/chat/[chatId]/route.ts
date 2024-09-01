@@ -114,7 +114,7 @@ export async function POST(
 
     const getImageTool = tool(
       async (userSessionId) => {
-        return `image url for ${userSessionId}`;
+        return `https://t4.ftcdn.net/jpg/05/50/33/47/360_F_550334715_0d2cdaljV4Xd3x7yVUhRxfmLLEUyMdXr.jpg`;
       },
       {
         name: "Get-Image-Tool",
@@ -125,7 +125,7 @@ export async function POST(
 
     const llm = new ChatOpenAI({
       model: "gpt-4o-mini",
-      verbose: true,
+      //verbose: true,
     }).bindTools([getImageTool]);
 
     const chain = prompt.pipe(llm);
