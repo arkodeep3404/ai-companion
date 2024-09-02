@@ -4,7 +4,7 @@ import prismadb from "@/lib/prismadb";
 
 import { tool } from "@langchain/core/tools";
 import { DynamoDBChatMessageHistory } from "@langchain/community/stores/message/dynamodb";
-import { ChatOpenAI } from "@langchain/openai";
+import { AzureChatOpenAI } from "@langchain/openai";
 import { RunnableWithMessageHistory } from "@langchain/core/runnables";
 import {
   ChatPromptTemplate,
@@ -54,6 +54,8 @@ export async function POST(
         { status: 404 },
       );
     }
+
+    console.log(`chat started with ${user.email}`);
 
     const { prompt: message } = await req.json();
 
@@ -123,7 +125,7 @@ export async function POST(
       },
     );
 
-    const llm = new ChatOpenAI({
+    const llm = new AzureChatOpenAI({
       model: "gpt-4o-mini",
       //verbose: true,
     }).bindTools([getImageTool]);
