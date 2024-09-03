@@ -12,7 +12,7 @@ import {
 } from "@langchain/core/prompts";
 
 // import { } from "ai";
-import { updateLastMessagesAdditionalKwargs } from "@/lib/updateLastMessagesAdditionalKwargs";
+import { updateLastMessagesAdditionalKwargs } from "@/lib/dynamoDB";
 
 // TODO: MAP EACH CHAT TO UNIQUE CHAT HISTORY ID
 
@@ -97,6 +97,18 @@ export async function POST(
       return new NextResponse("Companion not found", { status: 404 });
     }
 
+    const history = await prismadb.history.upsert({
+      where: {
+        userId: user.id,
+        companionId: companion.id,
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        companionId: companion.id,
+      },
+    });
+
     // new ai part begins from here
 
     const prompt = ChatPromptTemplate.fromMessages([
@@ -154,7 +166,7 @@ export async function POST(
 
     const res = await runnableWithChatHistory.invoke(
       { input: message },
-      { configurable: { sessionId: params.chatId } },
+      { configurable: { sessionId: history.id } },
     );
 
     if (!res) {
@@ -173,9 +185,9 @@ export async function POST(
       console.log(res.content);
       content = res.content;
     } else if (res.tool_calls?.length !== 0) {
-      console.log(await updateLastMessagesAdditionalKwargs(params.chatId));
-      console.log(await getImageTool.invoke(params.chatId));
-      content = await getImageTool.invoke(params.chatId);
+      console.log(await updateLastMessagesAdditionalKwargs(history.id));
+      console.log(await getImageTool.invoke(history.id));
+      content = await getImageTool.invoke(history.id);
     }
 
     // const companion_file_name = companion.id! + ".txt";
