@@ -10,11 +10,12 @@ generator client {
 }
 
 model User {
-  id        String @id @default(uuid())
-  email     String @unique
-  token     String @unique
+  id        String    @id @default(uuid())
+  email     String    @unique
+  token     String    @unique
   firstName String
   lastName  String
+  history   History[]
 }
 
 model Category {
@@ -62,6 +63,16 @@ model Message {
   companion Companion @relation(fields: [companionId], references: [id], onDelete: Cascade)
 
   @@index([companionId])
+}
+
+model History {
+  id          String @id @default(uuid())
+  userId      String @unique
+  companionId String @unique
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model UserSubscription {

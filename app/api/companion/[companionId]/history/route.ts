@@ -1,4 +1,5 @@
 // import { MemoryManager } from "@/lib/memory";
+import { deleteUserCompanionChatHistory } from "@/lib/dynamoDB";
 import prismadb from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 
@@ -33,6 +34,22 @@ export async function DELETE(
       return new NextResponse("Companion ID is required", { status: 400 });
     }
 
+    const history = await prismadb.history.findUnique({
+      where: {
+        userId: user.id,
+        companionId: params.companionId,
+      },
+    });
+
+    if (!history) {
+      return Response.json(
+        {
+          message: "companion chat history not found",
+        },
+        { status: 404 },
+      );
+    }
+
     // const memoryManager = await MemoryManager.getInstance();
     // const companionKey = {
     //   companionId: params.companionId,
@@ -42,6 +59,8 @@ export async function DELETE(
     // await memoryManager.clearHistory(companionKey);
 
     // TODO: DELETE CHAT HISTORY FROM DYNAMO DB UPON COMPANION DELETION
+
+    console.log(await deleteUserCompanionChatHistory(history.id));
 
     await prismadb.message.deleteMany({
       where: {

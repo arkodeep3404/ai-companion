@@ -2,31 +2,33 @@ import {
   DynamoDBClient,
   GetItemCommand,
   UpdateItemCommand,
+  DeleteItemCommand,
 } from "@aws-sdk/client-dynamodb";
 
 import dotenv from "dotenv";
 dotenv.config();
 
-const tableName = process.env.AWS_DYNAMO_DB_TABLE_NAME!;
 const region = process.env.AWS_REGION!;
+const tableName = process.env.AWS_DYNAMO_DB_TABLE_NAME!;
+const partitionKey = process.env.AWS_DYNAMO_DB_TABLE_PARTITION_KEY!;
 const accessKeyId = process.env.AWS_DYNAMO_DB_ACCESS_KEY_ID!;
 const secretAccessKey = process.env.AWS_DYNAMO_DB_SECRET_ACCESS_KEY!;
 
-export async function updateLastMessagesAdditionalKwargs(
-  userSessionId: string,
-) {
-  const client = new DynamoDBClient({
-    region,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-  });
+const client = new DynamoDBClient({
+  region,
+  credentials: {
+    accessKeyId,
+    secretAccessKey,
+  },
+});
 
+export async function updateLastMessagesAdditionalKwargs(
+  userCompanionChatHistorySessionId: string,
+) {
   const getParams = {
     TableName: tableName,
     Key: {
-      id: { S: userSessionId },
+      [partitionKey]: { S: userCompanionChatHistorySessionId },
     },
   };
 
@@ -42,7 +44,7 @@ export async function updateLastMessagesAdditionalKwargs(
     const updateParams: any = {
       TableName: tableName,
       Key: {
-        id: { S: userSessionId },
+        [partitionKey]: { S: userCompanionChatHistorySessionId },
       },
       UpdateExpression: `SET #messages[${messagesLength - 1}].#ak = :emptyObj`,
       ExpressionAttributeNames: {
@@ -57,7 +59,25 @@ export async function updateLastMessagesAdditionalKwargs(
 
     const updateData = await client.send(new UpdateItemCommand(updateParams));
     return updateData;
-  } catch (err) {
-    return err;
+  } catch (error) {
+    return error;
+  }
+}
+
+export async function deleteUserCompanionChatHistory(
+  userCompanionChatHistorySessionId: string,
+) {
+  const deleteParams = {
+    TableName: tableName,
+    Key: {
+      [partitionKey]: { S: userCompanionChatHistorySessionId },
+    },
+  };
+
+  try {
+    const deleteData = await client.send(new DeleteItemCommand(deleteParams));
+    return deleteData;
+  } catch (error) {
+    return error;
   }
 }

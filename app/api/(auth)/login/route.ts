@@ -23,9 +23,8 @@ export async function POST(req: Request) {
 
     const { token } = parsedBody;
 
-    const user = await prismadb.user.update({
+    const user = await prismadb.user.findUnique({
       where: { token: token },
-      data: { token: "" },
     });
 
     if (user) {
@@ -57,6 +56,8 @@ export async function POST(req: Request) {
       );
     }
   } catch (error) {
+    console.log(error);
+
     return Response.json(
       {
         message: "something went wrong. please try again",
