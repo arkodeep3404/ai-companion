@@ -100,7 +100,7 @@ export async function POST(
     const prompt = ChatPromptTemplate.fromMessages([
       [
         "system",
-        ` You are a helpful assistant. Answer all questions to the best of your ability.
+        ` You are a friendly and helpful friend and companion. Answer all questions to the best of your ability.
 
         YOUR NAME: ${companion.name}
         YOUR INSTRUCTIONS: ${companion.instructions}
